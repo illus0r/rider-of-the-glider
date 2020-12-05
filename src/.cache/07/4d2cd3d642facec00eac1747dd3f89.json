@@ -1,0 +1,1 @@
+{"id":"index.html","dependencies":[],"generated":{"html":"import Veda from 'vedajs';\n\nconst veda = new Veda();\n\nveda.setCanvas(canvas);\nveda.loadFragmentShader(code);\n\nveda.play();\n"},"sourceMaps":null,"error":null,"hash":"6ad0c902c4a3dd8aeba2098be7c85b9b","cacheData":{}}

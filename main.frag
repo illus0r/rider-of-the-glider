@@ -14,7 +14,10 @@
 precision mediump float;
 uniform float time;
 uniform sampler2D mathTexture;
+uniform vec2 resolution;
+uniform vec2 mouse;
 
 void main(){
-  gl_FragColor = texture2D(mathTexture, vec2(.5));
+  vec2 uv = (2.*gl_FragCoord.xy-resolution) / resolution.y;
+  gl_FragColor = texture2D(mathTexture, uv);
 }

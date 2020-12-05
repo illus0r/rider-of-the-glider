@@ -1,8 +1,14 @@
-precision mediump float;
-uniform float time;
+/*{
+  "pixelRatio": 6,
+}*/
+
+precision highp float;
+#include "./common.glsl"
+#define PI 3.14159
 uniform vec2 resolution;
 
+
 void main() {
-    vec2 uv = (gl_FragCoord.xy*2.-resolution.xy) / resolution.y;
+    vec2 uv = gl_FragCoord.xy / resolution.xy;
     gl_FragColor = vec4(uv,0.5+0.5*sin(time),1.0);
 }

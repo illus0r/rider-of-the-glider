@@ -11,11 +11,12 @@
   ]
 }*/
 
-precision mediump float;
-uniform float time;
+
+#include "./common.glsl"
+precision highp float;
 uniform sampler2D mathTexture;
 uniform vec2 resolution;
-uniform vec2 mouse;
+
 
 void main(){
   vec2 uv = (2.*gl_FragCoord.xy-resolution) / resolution.y;

@@ -26,7 +26,7 @@ window.onkeydown = function(e) {
 //}
 
 const RADIUS = 16
-const RADIUS2 = 256
+const RADIUS2 = 32
 
 const shape = `
      *    *     
@@ -35,8 +35,8 @@ const shape = `
 
 const INITIAL_CONDITIONS = (Array(RADIUS * RADIUS * 4)).fill(0)//.map(
   //() => Math.random() > 0.5 ? 255 : 0)
-const INITIAL_CONDITIONS2 = (Array(RADIUS2 * RADIUS2 * 4)).fill(0).map(
-  () => Math.random() > 0.5 ? 255 : 0)
+const INITIAL_CONDITIONS2 = (Array(RADIUS2 * RADIUS2 * 4)).fill(0)//.map(
+  //() => Math.random() > 0.5 ? 255 : 0)
   //() => 0)
 
 const rows = shape.split('\n')
@@ -143,6 +143,12 @@ const updateLife2 = regl({
 	float rnd(float x) {return fract(54321.987 * sin(987.12345 * x))*2.-1.;}
 
   void main() {
+    //// spawn
+    //if(rnd(uv.x+uv.y*12.27+tick*.00001)>.99) {
+      //gl_FragColor = vec4(rnd(uv.x+uv.y)/2.+.5);
+      //return;
+    //}
+
     vec3 px = vec3(vec2(1./float(${RADIUS2})),.0);
     vec2 FC = uv*float(${RADIUS2});
 		

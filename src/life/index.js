@@ -144,10 +144,12 @@ const updateLife2 = regl({
 
   void main() {
     //// spawn
-    //if(rnd(uv.x+uv.y*12.27+tick*.00001)>.99) {
-      //gl_FragColor = vec4(rnd(uv.x+uv.y)/2.+.5);
-      //return;
-    //}
+    if(keyPressedSpace > .5) {
+      if(rnd(uv.x+uv.y*12.27+tick*.00001)>.99) {
+        gl_FragColor = vec4(rnd(uv.x+uv.y)/2.+.5);
+        return;
+      }
+    }
 
     vec3 px = vec3(vec2(1./float(${RADIUS2})),.0);
     vec2 FC = uv*float(${RADIUS2});

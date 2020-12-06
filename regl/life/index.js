@@ -16,7 +16,7 @@ const INITIAL_CONDITIONS2 = (Array(RADIUS * RADIUS * 4)).fill(0).map(
   () => 0)
 
 for(let i = 0; i < 4; i++)
-	INITIAL_CONDITIONS2[RADIUS*RADIUS*.5+RADIUS*.5+i] = 255*.3
+	INITIAL_CONDITIONS2[INITIAL_CONDITIONS2.length/2-i] = 255*.3
 
 const state = (Array(2)).fill().map(() =>
   regl.framebuffer({
@@ -109,39 +109,40 @@ const updateLife2 = regl({
     //}
     
     for(float i=-R;i<=R;i++){
-        for(float j=-R;j<=R;j++){
-            vec2 ij=vec2(i,j);
-            vec2 uv_n = uv+ij*px.xy; // uv of neighbour
-            if(uv_n!=fract(uv_n))continue; // on edge
-            vec4 neighbour=texture2D(prevState2, uv_n);
-						
-            if(length(neighbour)==0.)continue; // empty
+			for(float j=-R;j<=R;j++){
+					vec2 ij=vec2(i,j);
+					vec2 uv_n = uv+ij*px.xy; // uv of neighbour
+					if(uv_n!=fract(uv_n))continue; // on edge
+					vec4 neighbour=texture2D(prevState2, uv_n);
+					
+					if(length(neighbour)==0.)continue; // empty
 
-            p = neighbour.rg-ij;
-            v = neighbour.ba*2.-1.;
-            
-            if(abs(i)*abs(j)>0.01) { // if not current cell
-                float dist = distance(gl_FragColor.rg,p);
-                float target_dist = 2.;
-            	f+=normalize(gl_FragColor.rg-p)/dist*dist;
-            }
-            
-            if(length(v)>max_speed)
-                v = max_speed*normalize(v);
-            p+=v;
-            
-            if(p.x<1. && p.y<1. && p.x>=0. && p.y>=0.){
-                gl_FragColor.rg = p;
-                gl_FragColor.ba = v*.5+.5;
-                //break;
-            }
-        }
+					p = neighbour.rg-ij;
+					v = neighbour.ba*2.-1.;
+					
+					//if(abs(i)*abs(j)>0.01) { // if not current cell
+						//float dist = distance(gl_FragColor.rg,p);
+						//float target_dist = 2.;
+						//f+=normalize(gl_FragColor.rg-p)/dist*dist;
+					//}
+					
+					if(length(v)>max_speed)
+						v = max_speed*normalize(v);
+					p+=v;
+					
+					if(p==fract(p)){ // if the particle is guest
+						gl_FragColor.rg = p;
+						gl_FragColor.ba = v*.5+.5;
+					}
+			}
     }
     
     if(length(gl_FragColor)>0.){
         v = gl_FragColor.ba*2.-1.;
-        v += f/20.;
-        if(length(v)>max_speed) v = max_speed*normalize(v);
+        //v += f/20.;
+				//v*=.9;
+				v.y+=.05;
+        if(length(v)>max_speed) v=max_speed*normalize(v);
         if(FC.x+v.x<=max_speed*10.) v.x=-abs(v.x);
         if(FC.x+v.x>=float(${RADIUS})-max_speed*10.) v.x=abs(v.x);
         if(FC.y+v.y<=max_speed*10.) v.y=-abs(v.y);

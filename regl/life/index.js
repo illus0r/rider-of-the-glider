@@ -13,7 +13,10 @@ const RADIUS = 64
 const INITIAL_CONDITIONS = (Array(RADIUS * RADIUS * 4)).fill(0).map(
   () => Math.random() > 0.5 ? 255 : 0)
 const INITIAL_CONDITIONS2 = (Array(RADIUS * RADIUS * 4)).fill(0).map(
-  () => Math.random()*255)
+  () => 0)
+
+for(let i = 0; i < 4; i++)
+	INITIAL_CONDITIONS2[RADIUS*RADIUS*.5+RADIUS*.5+i] = 255*.3
 
 const state = (Array(2)).fill().map(() =>
   regl.framebuffer({

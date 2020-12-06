@@ -168,7 +168,7 @@ const setupQuad = regl({
   void main() {
     float state = texture2D(prevState, uv).r;
     float state2 = texture2D(prevState2, uv).r;
-    gl_FragColor = vec4(state, 0., state2, 1);
+    gl_FragColor = vec4(state2, state2, state*.5+state2, 1);
   }`,
 
   vert: `

@@ -1,0 +1,7 @@
+var regl = createREGL()
+
+    regl.frame(function () {
+      regl.clear({
+        color: [0, 0, 0, 1]
+      })
+    })

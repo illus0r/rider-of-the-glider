@@ -1,24 +1,28 @@
 /*{
-  "pixelRatio": 6,
   "server": 1234,
   "PASSES": [
     {
-      "fs": "./math.frag",
-      "TARGET": "mathTexture",
+      "fs": "./life.frag",
+      "TARGET": "lifeTexture",
+      "FLOAT": true,
+    },
+    {
+      "fs": "./player.frag",
+      "TARGET": "playerTexture",
       "FLOAT": true,
     },
     {}
   ]
 }*/
 
-
-#include "./common.glsl"
 precision highp float;
-uniform sampler2D mathTexture;
+uniform float time;
+uniform sampler2D lifeTexture;
+uniform sampler2D playerTexture;
 uniform vec2 resolution;
 
-
 void main(){
-  vec2 uv = (2.*gl_FragCoord.xy-resolution) / resolution.y;
-  gl_FragColor = texture2D(mathTexture, uv);
+  vec2 uv = gl_FragCoord.xy / resolution.xy;
+  gl_FragColor = texture2D(lifeTexture, uv);
+  gl_FragColor.r = texture2D(playerTexture, uv).r;
 }

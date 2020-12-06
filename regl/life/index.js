@@ -9,14 +9,18 @@ const regl = require('regl')(document.body)
  */
 
 
-const RADIUS = 64
+const RADIUS = 32
+const RADIUS2 = 128
 const INITIAL_CONDITIONS = (Array(RADIUS * RADIUS * 4)).fill(0).map(
   () => Math.random() > 0.5 ? 255 : 0)
-const INITIAL_CONDITIONS2 = (Array(RADIUS * RADIUS * 4)).fill(0).map(
+const INITIAL_CONDITIONS2 = (Array(RADIUS2 * RADIUS2 * 4)).fill(0).map(
   () => 0)
 
-for(let i = 0; i < 4; i++)
-	INITIAL_CONDITIONS2[INITIAL_CONDITIONS2.length/2-i] = 255*.3
+//for(let i = 0; i < 4; i++)
+	INITIAL_CONDITIONS2[INITIAL_CONDITIONS2.length/2+103-0] = 255*.1 // -v.y
+	INITIAL_CONDITIONS2[INITIAL_CONDITIONS2.length/2+103-1] = 255*.5 // -v.x
+	INITIAL_CONDITIONS2[INITIAL_CONDITIONS2.length/2+103-2] = 255*.5 // p.y
+	INITIAL_CONDITIONS2[INITIAL_CONDITIONS2.length/2+103-3] = 255*.5 // p.x
 
 const state = (Array(2)).fill().map(() =>
   regl.framebuffer({
@@ -31,7 +35,7 @@ const state = (Array(2)).fill().map(() =>
 const state2 = (Array(2)).fill().map(() =>
   regl.framebuffer({
     color: regl.texture({
-      radius: RADIUS,
+      radius: RADIUS2,
       data: INITIAL_CONDITIONS2,
       wrap: 'repeat'
     }),
@@ -97,8 +101,8 @@ const updateLife2 = regl({
 	float rnd(float x) {return fract(54321.987 * sin(987.12345 * x))*2.-1.;}
 
   void main() {
-    vec3 px = vec3(vec2(1./float(${RADIUS})),.0);
-    vec2 FC = uv*float(${RADIUS});
+    vec3 px = vec3(vec2(1./float(${RADIUS2})),.0);
+    vec2 FC = uv*float(${RADIUS2});
 		
     vec2 p,v,f=vec2(0.);
     
@@ -141,12 +145,12 @@ const updateLife2 = regl({
         v = gl_FragColor.ba*2.-1.;
         //v += f/20.;
 				//v*=.9;
-				v.y+=.05;
+				v.y+=.01;
         if(length(v)>max_speed) v=max_speed*normalize(v);
-        if(FC.x+v.x<=max_speed*10.) v.x=-abs(v.x);
-        if(FC.x+v.x>=float(${RADIUS})-max_speed*10.) v.x=abs(v.x);
-        if(FC.y+v.y<=max_speed*10.) v.y=-abs(v.y);
-        if(FC.y+v.y>=float(${RADIUS})-max_speed*10.) v.y=abs(v.y);
+        if(FC.x<max_speed) v.x=-abs(v.x);
+        if(FC.x>float(${RADIUS2})-max_speed) v.x=abs(v.x);
+        if(FC.y<max_speed) v.y=-abs(v.y);
+        if(FC.y>float(${RADIUS2})-max_speed) v.y=abs(v.y);
         gl_FragColor.ba = v*.5+.5;
     }
 }
@@ -157,6 +161,7 @@ const updateLife2 = regl({
 
 	uniforms: {
     tick: regl.context('tick'),
+		prevState: ({tick}) => state[(tick) % 2],
   },
 })
 
@@ -167,9 +172,12 @@ const setupQuad = regl({
   uniform sampler2D prevState2;
   varying vec2 uv;
   void main() {
-    float state = texture2D(prevState, uv).r;
-    float state2 = texture2D(prevState2, uv).r;
-    gl_FragColor = vec4(state2, state2, state*.5+state2, 1);
+    gl_FragColor = vec4(0., 0., 0., 1.);
+		vec4 player = texture2D(prevState2, uv);
+		if(length(player)>0.) {
+			gl_FragColor = vec4(player.rgb, 1.);
+		}
+    gl_FragColor.b += texture2D(prevState, uv).r*.5;
   }`,
 
   vert: `

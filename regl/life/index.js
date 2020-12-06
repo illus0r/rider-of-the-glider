@@ -18,7 +18,7 @@ const INITIAL_CONDITIONS2 = (Array(RADIUS2 * RADIUS2 * 4)).fill(0).map(
 
 //for(let i = 0; i < 4; i++)
 	INITIAL_CONDITIONS2[INITIAL_CONDITIONS2.length/2+103-0] = 255*.1 // -v.y
-	INITIAL_CONDITIONS2[INITIAL_CONDITIONS2.length/2+103-1] = 255*.5 // -v.x
+	INITIAL_CONDITIONS2[INITIAL_CONDITIONS2.length/2+103-1] = 255*.9 // -v.x
 	INITIAL_CONDITIONS2[INITIAL_CONDITIONS2.length/2+103-2] = 255*.5 // p.y
 	INITIAL_CONDITIONS2[INITIAL_CONDITIONS2.length/2+103-3] = 255*.5 // p.x
 
@@ -93,6 +93,7 @@ const updateLife2 = regl({
   precision mediump float;
   uniform sampler2D prevState2;
   uniform float tick;
+  uniform sampler2D prevState;
   varying vec2 uv;
 
 	#define R 3.
@@ -132,7 +133,14 @@ const updateLife2 = regl({
 					
 					if(length(v)>max_speed)
 						v = max_speed*normalize(v);
-					p+=v;
+
+					// if not in not blocked by GoL pattern, move
+					if(texture2D(prevState, uv).r == 0.) {
+						p+=v;
+					}
+					else {
+						v*=0.1;
+					}
 					
 					if(p==fract(p)){ // if the particle is guest
 						gl_FragColor.rg = p;

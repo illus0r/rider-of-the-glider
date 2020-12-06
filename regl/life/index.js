@@ -1,5 +1,18 @@
 const regl = require('regl')(document.body)
 
+var pressedKeys = {
+	'ArrowLeft': 0,
+	'ArrowRight': 0,
+};
+
+window.onkeyup = function(e) {
+	pressedKeys[e.code] = 0
+	//console.log(pressedKeys[e.code], 'up')
+}
+window.onkeydown = function(e) {
+	pressedKeys[e.code] = 1
+	//console.log(pressedKeys[e.code], 'down')
+}
 
 /*
   tags: fbo, basic
@@ -8,6 +21,8 @@ const regl = require('regl')(document.body)
 
  */
 
+//const keyCodes = {
+//}
 
 const RADIUS = 32
 const RADIUS2 = 128
@@ -18,7 +33,7 @@ const INITIAL_CONDITIONS2 = (Array(RADIUS2 * RADIUS2 * 4)).fill(0).map(
 
 //for(let i = 0; i < 4; i++)
 	INITIAL_CONDITIONS2[INITIAL_CONDITIONS2.length/2+103-0] = 255*.1 // -v.y
-	INITIAL_CONDITIONS2[INITIAL_CONDITIONS2.length/2+103-1] = 255*.9 // -v.x
+	INITIAL_CONDITIONS2[INITIAL_CONDITIONS2.length/2+103-1] = 255*.5 // -v.x
 	INITIAL_CONDITIONS2[INITIAL_CONDITIONS2.length/2+103-2] = 255*.5 // p.y
 	INITIAL_CONDITIONS2[INITIAL_CONDITIONS2.length/2+103-3] = 255*.5 // p.x
 
@@ -93,11 +108,13 @@ const updateLife2 = regl({
   precision mediump float;
   uniform sampler2D prevState2;
   uniform float tick;
+  uniform float keyPressedLeft;
+  uniform float keyPressedRight;
   uniform sampler2D prevState;
   varying vec2 uv;
 
 	#define R 3.
-	#define max_speed 1.
+	#define max_speed 2.
 
 	float rnd(float x) {return fract(54321.987 * sin(987.12345 * x))*2.-1.;}
 
@@ -129,12 +146,18 @@ const updateLife2 = regl({
 						v = max_speed*normalize(v);
 
 					// if not in not blocked by GoL pattern, move
-					if(texture2D(prevState, uv_n).r == 0.) {
+					if(texture2D(prevState, uv_n).r == 1.) {
 						p+=v;
+						v.y=-abs(v.y*1.1);
 					}
 					else {
-						v.y=-abs(v.y);
 						p+=v;
+					}
+					if(keyPressedLeft > .5) {
+						p.x += .3;
+					}
+					if(keyPressedRight > .5) {
+						p.x -= .3;
 					}
 					
 					if(p==fract(p)){ // if the particle is guest
@@ -165,6 +188,12 @@ const updateLife2 = regl({
 	uniforms: {
     tick: regl.context('tick'),
 		prevState: ({tick}) => state[(tick) % 2],
+		keyPressedLeft: () => {
+			return pressedKeys['ArrowLeft']
+		},
+		keyPressedRight: () => {
+			return pressedKeys['ArrowRight']
+		},
   },
 })
 
@@ -214,3 +243,4 @@ regl.frame(() => {
     regl.draw()
   })
 })
+

@@ -26,7 +26,7 @@ window.onkeydown = function(e) {
 //}
 
 const RADIUS = 16
-const RADIUS2 = 64
+const RADIUS2 = 256
 
 const shape = `
      *    *     
@@ -35,7 +35,8 @@ const shape = `
 
 const INITIAL_CONDITIONS = (Array(RADIUS * RADIUS * 4)).fill(0)//.map(
   //() => Math.random() > 0.5 ? 255 : 0)
-const INITIAL_CONDITIONS2 = (Array(RADIUS2 * RADIUS2 * 4)).fill(0)//.map(
+const INITIAL_CONDITIONS2 = (Array(RADIUS2 * RADIUS2 * 4)).fill(0).map(
+  () => Math.random() > 0.5 ? 255 : 0)
   //() => 0)
 
 const rows = shape.split('\n')

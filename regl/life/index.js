@@ -3,15 +3,16 @@ const regl = require('regl')(document.body)
 var pressedKeys = {
 	'ArrowLeft': 0,
 	'ArrowRight': 0,
+	'Space': 0,
 };
 
 window.onkeyup = function(e) {
 	pressedKeys[e.code] = 0
-	//console.log(pressedKeys[e.code], 'up')
+	console.log(e.code, 'up')
 }
 window.onkeydown = function(e) {
 	pressedKeys[e.code] = 1
-	//console.log(pressedKeys[e.code], 'down')
+	console.log(pressedKeys[e.code], 'down')
 }
 
 /*
@@ -24,7 +25,7 @@ window.onkeydown = function(e) {
 //const keyCodes = {
 //}
 
-const RADIUS = 32
+const RADIUS = 16
 const RADIUS2 = 128
 const INITIAL_CONDITIONS = (Array(RADIUS * RADIUS * 4)).fill(0).map(
   () => Math.random() > 0.5 ? 255 : 0)
@@ -80,7 +81,7 @@ const updateLife = regl({
   varying vec2 uv;
   void main() {
 		float s = texture2D(prevState, uv).r;
-		if(mod(tick,10.)!=0.){
+		if(mod(tick,100.)!=0.){
 			gl_FragColor = vec4(s);
 			return;
 		}
@@ -110,6 +111,7 @@ const updateLife2 = regl({
   uniform float tick;
   uniform float keyPressedLeft;
   uniform float keyPressedRight;
+  uniform float keyPressedSpace;
   uniform sampler2D prevState;
   varying vec2 uv;
 
@@ -145,19 +147,23 @@ const updateLife2 = regl({
 					if(length(v)>max_speed)
 						v = max_speed*normalize(v);
 
-					// if not in not blocked by GoL pattern, move
+					// if blocked by GoL pattern
 					if(texture2D(prevState, uv_n).r == 1.) {
 						p+=v;
-						v.y=-abs(v.y*1.1);
+						//v.y=-abs(v.y*.9);
+						if(keyPressedSpace > .5) {
+							v.y = -.9;
+						}
+						v.y=-.5;
 					}
 					else {
 						p+=v;
-					}
-					if(keyPressedLeft > .5) {
-						p.x += .3;
-					}
-					if(keyPressedRight > .5) {
-						p.x -= .3;
+						if(keyPressedLeft > .5) {
+							v.x += .3;
+						}
+						if(keyPressedRight > .5) {
+							v.x -= .3;
+						}
 					}
 					
 					if(p==fract(p)){ // if the particle is guest
@@ -169,9 +175,8 @@ const updateLife2 = regl({
     
     if(length(gl_FragColor)>0.){
         v = gl_FragColor.ba*2.-1.;
-        //v += f/20.;
-				//v*=.9;
-				v.y+=.01;
+				v *= .9;
+				v.y+=.2;
         if(length(v)>max_speed) v=max_speed*normalize(v);
         if(FC.x<max_speed) v.x=-abs(v.x);
         if(FC.x>float(${RADIUS2})-max_speed) v.x=abs(v.x);
@@ -188,12 +193,9 @@ const updateLife2 = regl({
 	uniforms: {
     tick: regl.context('tick'),
 		prevState: ({tick}) => state[(tick) % 2],
-		keyPressedLeft: () => {
-			return pressedKeys['ArrowLeft']
-		},
-		keyPressedRight: () => {
-			return pressedKeys['ArrowRight']
-		},
+		keyPressedLeft: () => {return pressedKeys['ArrowLeft']},
+		keyPressedRight: () => {return pressedKeys['ArrowRight']},
+		keyPressedSpace: () => {return pressedKeys['Space']},
   },
 })
 
@@ -237,7 +239,6 @@ const setupQuad = regl({
 
 regl.frame(() => {
   setupQuad(() => {
-		//updatePlayer()
     updateLife()
     updateLife2()
     regl.draw()

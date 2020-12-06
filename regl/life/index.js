@@ -125,21 +125,16 @@ const updateLife2 = regl({
 					p = neighbour.rg-ij;
 					v = neighbour.ba*2.-1.;
 					
-					//if(abs(i)*abs(j)>0.01) { // if not current cell
-						//float dist = distance(gl_FragColor.rg,p);
-						//float target_dist = 2.;
-						//f+=normalize(gl_FragColor.rg-p)/dist*dist;
-					//}
-					
 					if(length(v)>max_speed)
 						v = max_speed*normalize(v);
 
 					// if not in not blocked by GoL pattern, move
-					if(texture2D(prevState, uv).r == 0.) {
+					if(texture2D(prevState, uv_n).r == 0.) {
 						p+=v;
 					}
 					else {
-						v*=0.1;
+						v.y=-abs(v.y);
+						p+=v;
 					}
 					
 					if(p==fract(p)){ // if the particle is guest
